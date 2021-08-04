@@ -132,22 +132,21 @@ def get_ticker(n_clicks, time, ticker, mkt):
 	try: 
 		# Name and price
 		stock_name = stock.info['longName']
-		price_list = stock.history(period=time)['Close'].tolist()
-		price = f'${price_list[-1]:.2f}'
+		price = stock.info['_lastClose']
+
 		# Price Change
-		price_change = price_list[-1] - price_list[-2]
-		price_percent_change = (price_list[-1]/price_list[-2])-1
-		if price_change > 0:
+		if stock.info['_priceChangeDir'] == 'Positive':
 			price_change_colour = {'color':'green'}
 		else:
 			price_change_colour = {'color':'red'}
+
 		price_change_colour['display']= 'inline-block'
 		price_change_colour['width']= '20%'
 		price_change_colour['font-size'] = '150%'
-		price_change = f'{price_change:.2f}'
-		price_percent_change = f'{price_percent_change*100:,.2f}%'
+		price_change = stock.info['_priceChange']
+		price_percent_change = stock.info['_priceChangePercent']
 
-		fig = getCandlestick(df.reset_index())
+		fig = getCandlestick(stock.history(period=time).reset_index())
 		table = getTab1Table(stock.history(period=time).reset_index(),
 			                 stock.info)
 
