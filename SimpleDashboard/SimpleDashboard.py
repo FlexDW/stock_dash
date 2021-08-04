@@ -6,7 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from flask_caching import Cache
-import DashCache
+import stock_data
 from Layout import *
 
 
@@ -15,14 +15,14 @@ from Layout import *
 app = dash.Dash(__name__)
 
 cache = Cache(app.server, config={
-    'CACHE_TYPE': 'filesystem', #
+    'CACHE_TYPE': 'filesystem', 
     'CACHE_DIR': '/flaskcache',
-	'CACHE_DEFAULT_TIMEOUT': 60 * 60 * 2,
-    'CACHE_THRESHOLD': 100,
+	'CACHE_DEFAULT_TIMEOUT': 60 * 60 * 2, # cache for 2 hours
+    'CACHE_THRESHOLD': 100, # allow up to 100 stocks in cache
     'CACHE_IGNORE_ERRORS': False
 })
 
-yfinance = DashCache.yfinance(cache)
+StockData = stock_data.StockData(cache)
 
 # Base Layout
 app.layout = html.Div([
@@ -87,22 +87,6 @@ def verify_ticker(ticker, mkt):
 			return False, None
 	return False, None
 
-# Obtain 50- ,100- and 200-day moving average
-def getMA(stock, time, date_list):
-	if 'mo' in time or time=='ytd' or time=='1y':
-		df = stock.history(period='2y')
-	elif time=='2y' or time=='3y' or time=='4y':
-		df = stock.history(period='5y')
-	else:
-		df = stock.history(period='10y')
-	df = df.reset_index()[['Date','Open','Low','High','Close']]
-	df['MA50'] = df.Close.rolling(50).mean()
-	df['MA100'] = df.Close.rolling(100).mean()
-	df['MA200'] = df.Close.rolling(200).mean()
-
-	df = df.loc[(df['Date']>=date_list.min()) & (df['Date']<=date_list.max())]
-	return df
-
 # Generate stock price and graph on Tab 1
 @app.callback([Output('tab1-stock-name','children'), # Stock Name
 	           Output('tab1-ticker','children'), # Ticker
@@ -137,7 +121,7 @@ def get_ticker(n_clicks, time, ticker, mkt):
 		       {'width':'20%', 'display':'inline-block'}, \
 		       'Error! Please try again.', {'data':None}, None
 	# Obtain stock price and stats
-	stock = yfinance.Ticker(ticker)
+	stock = StockData.Ticker(ticker)
 	# Catch if stock exists
 	if stock.history(period='ytd').shape[0] == 0:
 		return 'Wrong Ticker', '#######', '$##.##', '##.##', \
@@ -163,10 +147,7 @@ def get_ticker(n_clicks, time, ticker, mkt):
 		price_change = f'{price_change:.2f}'
 		price_percent_change = f'{price_percent_change*100:,.2f}%'
 
-		df = getMA(stock, time, 
-			       stock.history(period=time).reset_index()['Date'])
-
-		fig = getCandlestick(df)
+		fig = getCandlestick(df.reset_index())
 		table = getTab1Table(stock.history(period=time).reset_index(),
 			                 stock.info)
 
@@ -248,7 +229,7 @@ def generate_tab2_graph(mkt,stocks,time):
 		for stock in stocks:
 			if mkt=='hsi':
 				stock = stock[1:] + '.HK'
-			stock_df = yfinance.Ticker(stock).history(period=time)
+			stock_df = StockData.Ticker(stock).history(period=time)
 			stock_df = stock_df.reset_index()[['Date','Close']]
 			stock_df.columns = ['Date',stock]
 			df_stocks.append(stock_df)
@@ -273,7 +254,7 @@ def generate_tab2_graph(mkt,stocks,time):
 		return html.Table(), {'data': None}
 
 	# Prepare the data set to plot the line chart
-	index = yfinance.Ticker(y_ticker)
+	index = StockData.Ticker(y_ticker)
 	df_index = index.history(period=time).reset_index()[['Date','Close']]
 	df_index.columns = ['Date', index_col]
 	# To take out duplicated columns, ie, Date, while concat

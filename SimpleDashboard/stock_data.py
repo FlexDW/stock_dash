@@ -4,12 +4,19 @@ import json
 import pandas as pd
 import yfinance as yf
 
-class yfinance:
+class StockData:
     """
     yfinance wrapper class to enable cache.
 
-    Only minimal methods, attributes implemented 
-    which are used in the Dash app.
+    Only minimal methods, attributes implemented used in the dashboard:
+      - Ticker (method, activates class for specific ticker)
+      - info (dictionary of key info related to security)
+      - history (returns a pandas DataFrame of the stock history)
+
+    Additional methods added to handle transformations relevant to the dashboard:
+      - moving_average
+      - 52_week_high_low
+      - last_close_change
     """
 
     def __init__(self, flask_cache):
@@ -31,6 +38,8 @@ class yfinance:
             self.ticker = ticker
             self.info = yf_ticker.info
             self._history = yf_ticker.history('10y')
+
+            self.data_transform()
 
             self._cache.set(ticker, {
                 'ticker': self.ticker,
@@ -63,3 +72,29 @@ class yfinance:
             return self._history[self._history.index > time_idx[period]]
         else:
             return None
+
+    def data_transform(self):
+        """
+        Add transformations to stock info and price history.
+        """
+
+        # calculate moving averages
+        self._history['MA50'] = self._history['Close'].rolling(50).mean()
+        self._history['MA100'] = self._history['Close'].rolling(100).mean()
+        self._history['MA200'] = self._history['Close'].rolling(200).mean()
+
+        # price movement (last close on previous close)
+        last_close = self._history['Close'][-1]
+        prev_close = self._history['Close'][-2]
+        price_change = last_close - prev_close
+        price_change_pc = (last_close/prev_close) - 1
+        if price_change >= 0:
+            price_change_dir = 'Positive'
+        else:
+            price_chage_dir = 'Negative'
+
+        # format and add to 'info'
+        self.info['_lastClose'] = f'${last_close:,.3f}'  
+        self.info['_priceChange'] = f'${price_change:,.3f}' 
+        self.info['_priceChangePercent'] = f'{price_change_pc*100:,.2f}%' 
+        self.info['_priceChangeDir'] = price_change_dir

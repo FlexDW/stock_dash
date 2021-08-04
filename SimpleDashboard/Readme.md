@@ -42,7 +42,12 @@ Todo:
 I will move all the data transformations to the new data API, as part of simplifying the app callback functions e.g.:
 - Moving Averages
 - Last price movement
-- 52 Week Ranges
+- 52 Week range
+
+Notes:
+- I noticed that the code copied from Jacques has a bug in that the moving averages are not currently displaying. So in this refactoring I fixed the rendering function for this and also moved the data transformations to the cache api. 
+- There may be more transformations that I discover later which are also appropriate to move to the api. 
+- Since the API is now more than just a cache, i saw it appropriate to relabel it as 'stock_data'.
 
 4. **Split Callback Functions**
 
