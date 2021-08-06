@@ -4,6 +4,10 @@ import json
 import pandas as pd
 import yfinance as yf
 
+### Potential issue in how the object is passed around
+### If multiple concurrent users are changing "global object"
+### Consider returning copy
+
 class StockData:
     """
     yfinance wrapper class to enable cache.
@@ -26,6 +30,10 @@ class StockData:
         self._history = None
 
     def Ticker(self, ticker):
+
+        if self.ticker == ticker:
+            return self
+
         ticker_cached = self._cache.get(ticker)
         
         if ticker_cached:
@@ -91,7 +99,7 @@ class StockData:
         if price_change >= 0:
             price_change_dir = 'Positive'
         else:
-            price_chage_dir = 'Negative'
+            price_change_dir = 'Negative'
 
         # format and add to 'info'
         self.info['_lastClose'] = f'${last_close:,.3f}'  

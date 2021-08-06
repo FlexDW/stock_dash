@@ -52,7 +52,9 @@ Notes:
 - Since the API is now more than just a cache, i saw it appropriate to relabel it as 'stock_data'.
 
 To do:
+- Move 'Positive/Negative' price change from Ticker().info as central control to secondary class for Red/Green style colour
 - Add moving average controllers toggle on/off as options
+
 
 
 4. **Split Callback Functions**
