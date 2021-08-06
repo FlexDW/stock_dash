@@ -35,14 +35,25 @@ Notes:
 
 Todo:
 - One issue I encountered was the configuration of the 'FileSystemCache' in Flask, apparently the version of Flask I am using (default on anaconda3 2021.05) is old, so the cache configuration variable must be set to filesystem. I will upgrade at a later stage. 
+- When selecting a stock, you have to actually click 'submit' i would like to add keyboard 'Enter' as an option
+- The time period radio options would be nicer as buttons
 
 
-3. **Move Data Transformations to API class**
+3. ~~**Move Data Transformations to API class**~~ Done!
 
-I will move all the data transformations to the new data API, as part of simplifying the app callback functions e.g.:
-- Moving Averages
-- Last price movement
-- 52 Week Ranges
+~~I will move all the data transformations to the new data API, as part of simplifying the app callback functions e.g.:~~
+- ~~Moving Averages~~
+- ~~Last price movement~~
+- ~~52 Week range~~
+
+Notes:
+- I noticed that the code copied from Jacques has a bug in that the moving averages are not currently displaying. So in this refactoring I fixed the rendering function for this and also moved the data transformations to the cache api. 
+- There may be more transformations that I discover later which are also appropriate to move to the api. 
+- Since the API is now more than just a cache, i saw it appropriate to relabel it as 'stock_data'.
+
+To do:
+- Add moving average controllers toggle on/off as options
+
 
 4. **Split Callback Functions**
 
