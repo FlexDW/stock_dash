@@ -1,5 +1,7 @@
 dash:
   build: ./SimpleDashboard
+  entrypoint: ["python"]
+  command: ["SimpleDashboard.py"]
   volumes: 
     - ./SimpleDashboard:/SimpleDashboard
   ports:

@@ -118,14 +118,34 @@ def getLinePlot(df, tab):
 
 # Generate candlestick
 def getCandlestick(df):
-	data = []
-	data.append(go.Candlestick(x=df['Date'], open=df['Open'],
-		                       high=df['High'], low=df['Low'],
-		                       close=df['Close']))
-	layout = {'xaxis':{'title':'Date','rangeslider':{'visible':False}},
-			  'yaxis':{'title':'Price ($)'},
-	          'hovermode':False}
-	return {'data':data, 'layout':layout}
+	fig = go.Figure(
+		data=[
+			go.Candlestick(
+				x=df['Date'],
+				open=df['Open'], 
+				high=df['High'],
+				low=df['Low'],
+				close=df['Close'],
+				name='Price'
+			), 
+			go.Scatter(x=df['Date'], y=df['MA50'], line=dict(width=1), name="MA50"),
+			go.Scatter(x=df['Date'], y=df['MA100'], line=dict(width=1), name="MA100"),
+			go.Scatter(x=df['Date'], y=df['MA200'], line=dict(width=1), name="MA200"),
+		]
+	)
+
+	fig.update_layout({
+		'xaxis': {
+			'title':'Date',
+			'rangeslider': {'visible':False}
+		},
+		'yaxis': {
+			'title':'Price ($)'
+		},
+		'hovermode': False
+	})
+
+	return fig
 
 # Generate Table for Tab 1 - Stock Stats
 def getTab1Table(df, stock_info):
