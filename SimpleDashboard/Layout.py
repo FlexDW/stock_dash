@@ -76,17 +76,22 @@ def get_interval_layout(tab):
 
 # Layout for graph, include time interval and graph
 def get_graph_layout(tab):
-	layout = html.Div([
+	layout = html.Div(className='eight columns', children=[
 		html.Br(),
+		html.H2(id=tab+'-ticker'),
 		get_interval_layout(tab),
-		dcc.Graph(id=tab+'-vis')
+		dcc.Graph(id=tab+'-vis'),
 		])
 	return layout
 
 # Layout for table for stats
 def get_table_layout(tab):
 	id_name = tab+'-table'
-	return html.Div([html.Br(),html.Br(),html.Table(id=id_name)])
+	return html.Div(className='four columns', children=[
+		html.Br(),
+		html.Br(),
+		html.Table(id=id_name),
+		])
 
 # Layout for stats and graph
 def get_stats_graph_layout(tab):

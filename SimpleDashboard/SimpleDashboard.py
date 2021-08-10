@@ -27,25 +27,34 @@ cache = Cache(app.server, config={
 # Layout                                          
 #######################################################
 app.layout = html.Div([
-    dcc.Tabs(id='dashboard-tabs', value='price-tab',children=[
-        dcc.Tab(label='Stock Price', value='price-tab',children=[
-            html.Div([html.H2(id='tab1-stock-name',
-                           style={'width':'30%','display':'inline-block'}), 
-                      html.H4(id='tab1-ticker', 
-                           style={'width':'10%','display':'inline-block'})],
-                      style={'width':'90%','margin':'auto'}),
-            # Position 0, Title
-            html.Div(get_tab1_info_box(),
-                     style={'width':'90%','margin':'auto'}),
+    dcc.Tabs(id='dashboard-tabs', value='price-tab', children=[
+
+        # Tab 1
+        dcc.Tab(label='Stock Price', value='price-tab', children=[
+
+            html.Div(className='row', children=[
+
+                    html.Div(className='four columns', children=[
+                        html.H2(id='tab1-stock-name'), 
+                    ]),
+
+                    html.Div(className='eight columns', children=[
+                        get_tab1_info_box(), 
+                    ]),
+                ]),
+
             # Position 1, Info and dropdown
-            html.Div(get_stats_graph_layout('tab1'),
-                     style={'width':'90%','margin':'auto'}),
+            html.Div(className='row', children=[
+                get_table_layout('tab1'),
+                get_graph_layout('tab1')
+            ]),
 
             # Tab 1, Data store
             dcc.Store(id='tab1-data-store')
 
-            # Position 2, Table of stats and graph
-            ]), # Tab 1, End price-tab
+        ]), 
+
+        # Tab 2
         dcc.Tab(label='Stock/Index Growth', value='change-tab',children=[
             html.Div([html.H2('Stock Price Growth vs. Index Growth')],
                      style={'width':'90%','margin':'auto',
@@ -98,7 +107,10 @@ def get_tab1_ticker(n_clicks, ticker):
     try: 
         stock = StockData.Ticker(ticker)
         outputs['tab1-ticker'] = ticker
-        outputs['tab1-stock-name'] = stock.info['longName']
+        outputs['tab1-stock-name'] = '{stock_name} ({ticker})'.format(
+            stock_name=stock.info['longName'],
+            ticker=ticker
+        ) 
 
     except:
         outputs['tab1-stock-name'] = 'Sorry! Company Not Available'
