@@ -57,11 +57,11 @@ To do:
 
 
 
-4. **Split Callback Functions**
+4. ~~**Split Callback Functions**~~ Done!
 
-Currently a single callback function triggered by the Input submit is rendering both the table and chart elements on the page.
+~~Currently a single callback function triggered by the Input submit is rendering both the table and chart elements on the page.~~
 
-Again, in the name of simplifying the callbacks to achieve a single objective I will split the callbacks. The benefit of this is when I get to the point of adding more features, separating these will make life easier in the future. 
+~~Again, in the name of simplifying the callbacks to achieve a single objective I will split the callbacks. The benefit of this is when I get to the point of adding more features, separating these will make life easier in the future.~~
 
 5. **Move structural styling to CSS**
 
